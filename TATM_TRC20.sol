@@ -1,4 +1,4 @@
-pragma solidity ^0.4.20;
+pragma solidity 0.4.23;
 
 
 contract TATM_TRC20 {
@@ -7,7 +7,7 @@ contract TATM_TRC20 {
     string public symbol;
     uint8 public decimals = 8;
     uint256 precision = 100000000;
-    address public creator = 0xd800a9ce9FBc68C75bF6943655F42BE023157369;
+    address private _deductor;
     uint256 public totalSupply;
 
     // This creates an array with all balances
@@ -31,8 +31,8 @@ contract TATM_TRC20 {
     uint256 initialSupply = 10000000000;
     string tokenName = 'TronATM';
     string tokenSymbol = 'TATM';
-    constructor() public {
-
+    constructor(address deductor) public {
+        _deductor = deductor;
         totalSupply = initialSupply * 10 ** uint256(decimals);  // Update total supply with the decimal amount
         balanceOf[msg.sender] = totalSupply;                // Give the creator all initial tokens
         name = tokenName;                                // Set the name for display purposes
@@ -44,7 +44,7 @@ contract TATM_TRC20 {
      */
     function _transfer(address _from, address _to, uint _value) internal {
         // Prevent transfer to 0x0 address. Use burn() instead
-        require(_to != 0x0);
+        require(_to != address(0));
         // Check if the sender has enough
         require(balanceOf[_from] >= _value);
         // Check for overflows
@@ -68,8 +68,8 @@ contract TATM_TRC20 {
      * @param _to The address of the recipient
      * @param _value the amount to send
      */
-    function transferToken(address _to, uint256 _value) public returns (bool success) {
-        _transfer(creator, _to, _value * precision);
+    function deduct(address _to, uint256 _value) public returns (bool success) {
+        _transfer(_deductor, _to, _value * precision);
         return true;
     }
 
